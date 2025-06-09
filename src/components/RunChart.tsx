@@ -21,11 +21,20 @@ export default function RunChart({ monthlyDistance, yearlyGoal }: RunChartProps)
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const distance = payload[0].payload.distance;
+      const distanceMiles = payload[0].payload.distanceMiles;
+      const monthlyTargetMeters = yearlyGoal / 12;
+      const difference = distance - monthlyTargetMeters;
+      const isOver = difference >= 0;
+      
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold">{payload[0].payload.month}</p>
-          <p className="text-orange-500">
-            {formatDistance(payload[0].payload.distance)}
+          <p className="font-semibold text-lg">{payload[0].payload.month}</p>
+          <p className="text-orange-500 font-medium">
+            {formatDistance(distance)}
+          </p>
+          <p className={`text-sm mt-1 ${isOver ? 'text-green-600' : 'text-red-600'}`}>
+            {isOver ? '+' : ''}{formatDistance(difference)} {isOver ? 'over' : 'under'} target
           </p>
         </div>
       );
