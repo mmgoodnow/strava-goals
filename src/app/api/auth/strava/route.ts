@@ -3,7 +3,7 @@ import { getAuthorizationUrl } from '@/lib/strava';
 
 export async function GET() {
   try {
-    const authUrl = getAuthorizationUrl();
+    const authUrl = await getAuthorizationUrl();
     console.log('Generated auth URL:', authUrl);
     
     // Let's also try constructing the URL manually to debug
