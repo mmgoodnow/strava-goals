@@ -3,8 +3,17 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
 import { formatDistance } from '@/lib/utils';
 
+interface Activity {
+  id: string;
+  name: string;
+  type: string;
+  distance: number;
+  start_date: string;
+  moving_time: number;
+}
+
 interface ProgressLineChartProps {
-  activities: any[];
+  activities: Activity[];
   yearlyGoal: number;
 }
 
@@ -83,7 +92,7 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
     targetMiles: yearlyGoal * 0.000621371,
   });
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { date: Date; actual: number; targetMiles: number } }> }) => {
     if (active && payload && payload.length && payload[0].payload.actual !== null) {
       const date = new Date(payload[0].payload.date);
       return (

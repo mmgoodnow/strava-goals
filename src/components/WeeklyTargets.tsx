@@ -81,7 +81,7 @@ export default function WeeklyTargets({ totalDistance, yearlyGoal }: WeeklyTarge
         {isAhead && (
           <div className="mt-4 p-3 bg-green-50 rounded-lg">
             <p className="text-green-800 text-sm">
-              Great job! You're ahead of schedule. Maintain {formatDistance(weeklyToFinish)}/week to comfortably reach your goal.
+              Great job! You&apos;re ahead of schedule. Maintain {formatDistance(weeklyToFinish)}/week to comfortably reach your goal.
             </p>
           </div>
         )}

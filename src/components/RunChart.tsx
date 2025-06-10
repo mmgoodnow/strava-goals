@@ -19,10 +19,9 @@ export default function RunChart({ monthlyDistance, yearlyGoal }: RunChartProps)
     distanceMiles: (monthlyDistance[index] || 0) * 0.000621371,
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { month: string; distance: number; distanceMiles: number } }> }) => {
     if (active && payload && payload.length) {
       const distance = payload[0].payload.distance;
-      const distanceMiles = payload[0].payload.distanceMiles;
       const monthlyTargetMeters = yearlyGoal / 12;
       const difference = distance - monthlyTargetMeters;
       const isOver = difference >= 0;

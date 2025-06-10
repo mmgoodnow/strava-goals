@@ -4,8 +4,7 @@ import {
   formatDistance, 
   getDaysRemainingInYear, 
   getDaysElapsedInYear,
-  calculateRequiredPace,
-  metersToMiles 
+  calculateRequiredPace
 } from '@/lib/utils';
 
 interface ProgressCardProps {
@@ -73,7 +72,7 @@ export default function ProgressCard({ totalDistance, yearlyGoal, runCount }: Pr
       {progress >= 100 && (
         <div className="mt-4 p-3 bg-green-100 rounded-lg text-center">
           <span className="text-green-800 font-semibold">
-            🎉 Goal achieved! You've exceeded your target by {formatDistance(totalDistance - yearlyGoal)}
+            🎉 Goal achieved! You&apos;ve exceeded your target by {formatDistance(totalDistance - yearlyGoal)}
           </span>
         </div>
       )}

@@ -8,13 +8,30 @@ import GoalSetter from './GoalSetter';
 import ProgressLineChart from './ProgressLineChart';
 import WeeklyTargets from './WeeklyTargets';
 
+interface Activity {
+  id: string;
+  name: string;
+  type: string;
+  distance: number;
+  start_date: string;
+  moving_time: number;
+}
+
 interface DashboardData {
-  activities: any[];
+  activities: Activity[];
   totalDistance: number;
   monthlyDistance: Record<number, number>;
   count: number;
-  stats?: any;
-  athlete?: any;
+  stats?: {
+    recent_run_totals?: {
+      count: number;
+      distance: number;
+    };
+  };
+  athlete?: {
+    firstname?: string;
+    lastname?: string;
+  };
 }
 
 export default function Dashboard() {

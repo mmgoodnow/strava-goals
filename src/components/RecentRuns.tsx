@@ -2,8 +2,17 @@
 
 import { formatDistance, formatPace } from '@/lib/utils';
 
+interface Activity {
+  id: string;
+  name: string;
+  type: string;
+  distance: number;
+  start_date: string;
+  moving_time: number;
+}
+
 interface RecentRunsProps {
-  activities: any[];
+  activities: Activity[];
 }
 
 export default function RecentRuns({ activities }: RecentRunsProps) {

@@ -25,15 +25,15 @@ export async function GET() {
     );
     
     const runningActivities = activities.filter(
-      (activity: any) => activity.type === 'Run'
+      (activity: { type: string }) => activity.type === 'Run'
     );
     
     const totalDistance = runningActivities.reduce(
-      (sum: number, activity: any) => sum + activity.distance,
+      (sum: number, activity: { distance: number }) => sum + activity.distance,
       0
     );
     
-    const monthlyDistance = runningActivities.reduce((acc: any, activity: any) => {
+    const monthlyDistance = runningActivities.reduce((acc: Record<number, number>, activity: { start_date: string; distance: number }) => {
       const month = new Date(activity.start_date).getMonth();
       acc[month] = (acc[month] || 0) + activity.distance;
       return acc;
