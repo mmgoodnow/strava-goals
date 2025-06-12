@@ -6,7 +6,7 @@ const stravaClient = new (strava as any).client(process.env.STRAVA_CLIENT_SECRET
 export const getAuthorizationUrl = () => {
   return (strava as any).oauth.getRequestAccessURL({
     client_id: process.env.STRAVA_CLIENT_ID || '',
-    redirect_uri: process.env.STRAVA_REDIRECT_URI || 'http://localhost:3000/api/auth/strava/callback',
+    redirect_uri: process.env.STRAVA_REDIRECT_URI,
     scope: 'read,activity:read_all'
   });
 };
