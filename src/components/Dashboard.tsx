@@ -7,6 +7,7 @@ import RecentRuns from './RecentRuns';
 import GoalSetter from './GoalSetter';
 import ProgressLineChart from './ProgressLineChart';
 import WeeklyTargets from './WeeklyTargets';
+import PaceAnalysisChart from './PaceAnalysisChart';
 
 interface Activity {
   id: string;
@@ -146,6 +147,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <RunChart monthlyDistance={data.monthlyDistance} yearlyGoal={yearlyGoal} />
         <RecentRuns activities={data.activities} />
+      </div>
+
+      <div className="mb-8">
+        <PaceAnalysisChart />
       </div>
     </div>
   );
