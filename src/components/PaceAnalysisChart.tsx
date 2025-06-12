@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Line, LineChart } from 'recharts';
+import { ComposedChart, Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { PaceActivity, aggregatePaceData, calculateTrendline, formatPaceTime } from '@/lib/utils';
 
 interface PaceAnalysisData {
@@ -162,7 +162,7 @@ export default function PaceAnalysisChart() {
       
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="period"
@@ -180,7 +180,7 @@ export default function PaceAnalysisChart() {
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             
-            {/* Data points */}
+            {/* Scatter plot points */}
             <Scatter 
               dataKey="y" 
               fill="#3b82f6"
@@ -197,7 +197,7 @@ export default function PaceAnalysisChart() {
               dot={false}
               name="Trend"
             />
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>
