@@ -77,11 +77,11 @@ export default function PaceAnalysisChart() {
   }
 
   // Prepare individual run data for scatter plot
-  const chartData = data.activities.map((activity, index) => {
+  const chartData = data.activities.map((activity) => {
     const date = new Date(activity.start_date);
     const distanceMiles = activity.distance * 0.000621371;
     return {
-      x: index,
+      x: date.getTime(), // Use timestamp for proper date spacing
       y: viewMode === 'pace' ? activity.pace : distanceMiles,
       date: date.toLocaleDateString(),
       name: activity.name,
@@ -105,7 +105,9 @@ export default function PaceAnalysisChart() {
   })));
 
   // Add trendline values to chart data
-  const chartDataWithTrend = chartData.map((point, index) => ({
+  // For trendline calculation, we need to map timestamps to indices for the linear regression
+  const sortedData = [...chartData].sort((a, b) => a.x - b.x);
+  const chartDataWithTrend = sortedData.map((point, index) => ({
     ...point,
     trendY: trendline.slope * index + trendline.intercept
   }));
@@ -231,10 +233,16 @@ export default function PaceAnalysisChart() {
           <ComposedChart data={chartDataWithTrend} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
-              dataKey="date"
+              dataKey="x"
+              type="number"
+              scale="time"
+              domain={['dataMin', 'dataMax']}
               tick={{ fill: '#6b7280', fontSize: 10 }}
               axisLine={{ stroke: '#e5e7eb' }}
-              interval="preserveStartEnd"
+              tickFormatter={(timestamp) => {
+                const date = new Date(timestamp);
+                return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+              }}
             />
             <YAxis 
               domain={['dataMin - 0.5', 'dataMax + 0.5']}
