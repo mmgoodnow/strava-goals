@@ -15,6 +15,7 @@ export default function PaceAnalysisChart() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [yearsBack, setYearsBack] = useState<1 | 2 | 3>(3);
+  const [viewMode, setViewMode] = useState<'pace' | 'distance'>('pace');
 
   useEffect(() => {
     fetchPaceData();
@@ -78,12 +79,15 @@ export default function PaceAnalysisChart() {
   // Prepare individual run data for scatter plot
   const chartData = data.activities.map((activity, index) => {
     const date = new Date(activity.start_date);
+    const distanceMiles = activity.distance * 0.000621371;
     return {
       x: index,
-      y: activity.pace,
+      y: viewMode === 'pace' ? activity.pace : distanceMiles,
       date: date.toLocaleDateString(),
       name: activity.name,
       distance: activity.distance,
+      distanceMiles: distanceMiles,
+      pace: activity.pace,
       moving_time: activity.moving_time,
       year: date.getFullYear(),
       fullDate: date
@@ -109,25 +113,35 @@ export default function PaceAnalysisChart() {
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { 
     date: string; 
     name: string; 
-    y: number; 
+    y: number;
+    pace: number;
+    distanceMiles: number;
     distance: number; 
     moving_time: number; 
     year: number 
   } }> }) => {
     if (active && payload && payload.length) {
       const runData = payload[0].payload;
-      const distanceMiles = (runData.distance * 0.000621371).toFixed(2);
       const durationMinutes = Math.floor(runData.moving_time / 60);
       const durationSeconds = runData.moving_time % 60;
       
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-sm">{runData.name}</p>
-          <p className="text-blue-600 text-lg font-bold">
-            {formatPaceTime(runData.y)}/mi
-          </p>
+          {viewMode === 'pace' ? (
+            <p className="text-blue-600 text-lg font-bold">
+              {formatPaceTime(runData.pace)}/mi
+            </p>
+          ) : (
+            <p className="text-blue-600 text-lg font-bold">
+              {runData.distanceMiles.toFixed(2)} miles
+            </p>
+          )}
           <p className="text-gray-600 text-sm">
-            {distanceMiles} miles • {durationMinutes}:{durationSeconds.toString().padStart(2, '0')}
+            {viewMode === 'pace' 
+              ? `${runData.distanceMiles.toFixed(2)} miles • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+              : `${formatPaceTime(runData.pace)}/mi • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+            }
           </p>
           <p className="text-gray-500 text-sm">
             {runData.date}
@@ -140,35 +154,75 @@ export default function PaceAnalysisChart() {
 
 
   // Calculate trend direction
-  const trendDirection = trendline.slope < 0 ? 'improving' : 'declining';
+  const trendDirection = viewMode === 'pace' 
+    ? (trendline.slope < 0 ? 'improving' : 'declining')
+    : (trendline.slope > 0 ? 'increasing' : 'decreasing');
   const trendMagnitude = Math.abs(trendline.slope);
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Pace Analysis</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
+          {viewMode === 'pace' ? 'Pace Analysis' : 'Distance Analysis'}
+        </h2>
         
-        <div className="flex gap-2">
-          {[1, 2, 3].map((years) => (
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* View mode selector */}
+          <div className="flex gap-2">
             <button
-              key={years}
-              onClick={() => setYearsBack(years as 1 | 2 | 3)}
+              onClick={() => setViewMode('pace')}
               className={`px-3 py-2 rounded-lg font-medium transition ${
-                yearsBack === years
-                  ? 'bg-orange-500 text-white'
+                viewMode === 'pace'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {years} Year{years > 1 ? 's' : ''}
+              Pace
             </button>
-          ))}
+            <button
+              onClick={() => setViewMode('distance')}
+              className={`px-3 py-2 rounded-lg font-medium transition ${
+                viewMode === 'distance'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Distance
+            </button>
+          </div>
+          
+          {/* Years selector */}
+          <div className="flex gap-2">
+            {[1, 2, 3].map((years) => (
+              <button
+                key={years}
+                onClick={() => setYearsBack(years as 1 | 2 | 3)}
+                className={`px-3 py-2 rounded-lg font-medium transition ${
+                  yearsBack === years
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {years} Year{years > 1 ? 's' : ''}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-4 text-sm text-gray-600">
         <span>Total runs: {data.count}</span>
-        <span className={`font-medium ${trendDirection === 'improving' ? 'text-green-600' : 'text-red-600'}`}>
-          Trend: {trendDirection} {trendMagnitude > 0.01 ? `(${formatPaceTime(trendMagnitude)}/mi per run)` : '(minimal change)'}
+        <span className={`font-medium ${
+          (viewMode === 'pace' && trendDirection === 'improving') || 
+          (viewMode === 'distance' && trendDirection === 'increasing') 
+            ? 'text-green-600' : 'text-red-600'
+        }`}>
+          Trend: {trendDirection} {trendMagnitude > 0.01 ? 
+            viewMode === 'pace' 
+              ? `(${formatPaceTime(trendMagnitude)}/mi per run)`
+              : `(${trendMagnitude.toFixed(2)} mi per run)`
+            : '(minimal change)'
+          }
         </span>
       </div>
       
@@ -186,8 +240,15 @@ export default function PaceAnalysisChart() {
               domain={['dataMin - 0.5', 'dataMax + 0.5']}
               tick={{ fill: '#6b7280' }}
               axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Pace (min/mile)', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
-              tickFormatter={(value) => formatPaceTime(value)}
+              label={{ 
+                value: viewMode === 'pace' ? 'Pace (min/mile)' : 'Distance (miles)', 
+                angle: -90, 
+                position: 'insideLeft', 
+                fill: '#6b7280' 
+              }}
+              tickFormatter={(value) => 
+                viewMode === 'pace' ? formatPaceTime(value) : `${value.toFixed(1)}`
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
@@ -196,7 +257,7 @@ export default function PaceAnalysisChart() {
             <Scatter 
               dataKey="y" 
               fill="#3b82f6"
-              name="Run Pace"
+              name={viewMode === 'pace' ? 'Run Pace' : 'Run Distance'}
             />
             
             {/* Trend line */}
