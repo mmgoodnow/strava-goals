@@ -14,7 +14,7 @@ export default function PaceAnalysisChart() {
   const [data, setData] = useState<PaceAnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [yearsBack, setYearsBack] = useState<1 | 2 | 3>(3);
+  const [yearsBack, setYearsBack] = useState<1 | 2 | 3>(1);
   const [viewMode, setViewMode] = useState<'pace' | 'distance'>('pace');
 
   useEffect(() => {
