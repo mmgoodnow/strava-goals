@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getActivities } from '@/lib/strava';
-import { getYearStartTimestamp, getYearEndTimestamp } from '@/lib/utils';
+import { getYearStartTimestamp, getYearEndTimestamp, SportType } from '@/lib/utils';
 
-export async function GET() {
+export async function GET(request: Request) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('strava_access_token');
 
@@ -15,6 +15,9 @@ export async function GET() {
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const sport = (searchParams.get('sport') as SportType) || 'Run';
+    
     const yearStart = getYearStartTimestamp();
     const yearEnd = getYearEndTimestamp();
     
@@ -24,26 +27,26 @@ export async function GET() {
       yearEnd
     );
     
-    const runningActivities = activities.filter(
-      (activity: { type: string }) => activity.type === 'Run'
+    const sportActivities = activities.filter(
+      (activity: { type: string }) => activity.type === sport
     );
     
-    const totalDistance = runningActivities.reduce(
+    const totalDistance = sportActivities.reduce(
       (sum: number, activity: { distance: number }) => sum + activity.distance,
       0
     );
     
-    const monthlyDistance = runningActivities.reduce((acc: Record<number, number>, activity: { start_date: string; distance: number }) => {
+    const monthlyDistance = sportActivities.reduce((acc: Record<number, number>, activity: { start_date: string; distance: number }) => {
       const month = new Date(activity.start_date).getMonth();
       acc[month] = (acc[month] || 0) + activity.distance;
       return acc;
     }, {});
 
     return NextResponse.json({
-      activities: runningActivities,
+      activities: sportActivities,
       totalDistance,
       monthlyDistance,
-      count: runningActivities.length,
+      count: sportActivities.length,
     });
   } catch (error) {
     console.error('Error fetching activities:', error);

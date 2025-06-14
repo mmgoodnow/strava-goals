@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { metersToMiles } from '@/lib/utils';
+import { metersToMiles, SportType, SPORT_CONFIG } from '@/lib/utils';
 
 interface GoalSetterProps {
   currentGoal: number;
   onGoalUpdate: (goal: number) => void;
+  sport: SportType;
 }
 
-const COMMON_GOALS = [100, 200, 300, 500, 750, 1000, 1500, 2000];
-
-export default function GoalSetter({ currentGoal, onGoalUpdate }: GoalSetterProps) {
+export default function GoalSetter({ currentGoal, onGoalUpdate, sport }: GoalSetterProps) {
+  const sportConfig = SPORT_CONFIG[sport];
   const currentGoalMiles = Math.round(metersToMiles(currentGoal));
   const [customValue, setCustomValue] = useState('');
 
@@ -45,7 +45,7 @@ export default function GoalSetter({ currentGoal, onGoalUpdate }: GoalSetterProp
         <div>
           <p className="text-sm text-gray-600 text-center mb-2">Quick select:</p>
           <div className="grid grid-cols-4 gap-2">
-            {COMMON_GOALS.map((goal) => (
+            {sportConfig.goalRanges.map((goal) => (
               <button
                 key={goal}
                 onClick={() => handleQuickSelect(goal)}

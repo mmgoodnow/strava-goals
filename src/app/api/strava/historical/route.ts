@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getActivities } from '@/lib/strava';
+import { SportType } from '@/lib/utils';
 
-export async function GET() {
+export async function GET(request: Request) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('strava_access_token');
 
@@ -14,6 +15,9 @@ export async function GET() {
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const sport = (searchParams.get('sport') as SportType) || 'Run';
+    
     const currentYear = new Date().getFullYear();
     const yearsToFetch = 5; // Fetch data for the last 5 years
     
@@ -31,29 +35,29 @@ export async function GET() {
           yearEnd
         );
         
-        const runningActivities = activities.filter(
-          (activity: { type: string }) => activity.type === 'Run'
+        const sportActivities = activities.filter(
+          (activity: { type: string }) => activity.type === sport
         );
         
         // Calculate average pace and other metrics for the year
-        const totalDistance = runningActivities.reduce(
+        const totalDistance = sportActivities.reduce(
           (sum: number, activity: { distance: number }) => sum + activity.distance,
           0
         );
         
-        const totalTime = runningActivities.reduce(
+        const totalTime = sportActivities.reduce(
           (sum: number, activity: { moving_time: number }) => sum + activity.moving_time,
           0
         );
         
         const averagePace = totalDistance > 0 ? totalTime / totalDistance : 0; // seconds per meter
         
-        // Group runs by distance ranges for pace analysis
+        // Group activities by distance ranges for pace analysis
         const distanceRanges = {
-          short: runningActivities.filter((a: { distance: number }) => a.distance < 5000), // < 5K
-          medium: runningActivities.filter((a: { distance: number }) => a.distance >= 5000 && a.distance < 10000), // 5K-10K
-          long: runningActivities.filter((a: { distance: number }) => a.distance >= 10000 && a.distance < 21097), // 10K-Half
-          ultraLong: runningActivities.filter((a: { distance: number }) => a.distance >= 21097), // Half+
+          short: sportActivities.filter((a: { distance: number }) => a.distance < 5000), // < 5K
+          medium: sportActivities.filter((a: { distance: number }) => a.distance >= 5000 && a.distance < 10000), // 5K-10K
+          long: sportActivities.filter((a: { distance: number }) => a.distance >= 10000 && a.distance < 21097), // 10K-Half
+          ultraLong: sportActivities.filter((a: { distance: number }) => a.distance >= 21097), // Half+
         };
         
         const rangeAnalysis = Object.entries(distanceRanges).reduce((acc, [range, activities]) => {
@@ -77,12 +81,12 @@ export async function GET() {
         
         yearlyData.push({
           year,
-          totalRuns: runningActivities.length,
+          totalRuns: sportActivities.length,
           totalDistance,
           totalTime,
           averagePace,
           rangeAnalysis,
-          activities: runningActivities,
+          activities: sportActivities,
         });
       } catch (yearError) {
         console.warn(`Failed to fetch data for year ${year}:`, yearError);

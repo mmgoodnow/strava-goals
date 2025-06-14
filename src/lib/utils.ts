@@ -44,6 +44,31 @@ export const calculateRequiredPace = (remainingDistance: number, daysRemaining: 
   return remainingDistance / daysRemaining;
 };
 
+// Sport configuration
+export type SportType = 'Run' | 'Ride';
+
+export interface SportConfig {
+  name: string;
+  icon: string;
+  unit: 'pace' | 'speed';
+  goalRanges: number[];
+}
+
+export const SPORT_CONFIG: Record<SportType, SportConfig> = {
+  Run: {
+    name: 'Running',
+    icon: '🏃',
+    unit: 'pace',
+    goalRanges: [200, 300, 500, 750, 1000, 1200, 1500, 2000]
+  },
+  Ride: {
+    name: 'Cycling', 
+    icon: '🚴',
+    unit: 'speed',
+    goalRanges: [1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000]
+  }
+};
+
 export const formatPace = (metersPerSecond: number, unit: 'mi' | 'km' = 'mi') => {
   if (metersPerSecond === 0) return '0:00';
   
@@ -55,6 +80,25 @@ export const formatPace = (metersPerSecond: number, unit: 'mi' | 'km' = 'mi') =>
   const seconds = Math.floor(secondsPerUnit % 60);
   
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+export const formatSpeed = (metersPerSecond: number, unit: 'mi' | 'km' = 'mi') => {
+  if (metersPerSecond === 0) return '0.0';
+  
+  const speed = unit === 'mi' 
+    ? (metersPerSecond * 3600) / 1609.34 // mph
+    : (metersPerSecond * 3600) / 1000; // kph
+  
+  return speed.toFixed(1);
+};
+
+export const formatSportMetric = (metersPerSecond: number, sport: SportType, unit: 'mi' | 'km' = 'mi') => {
+  const config = SPORT_CONFIG[sport];
+  if (config.unit === 'pace') {
+    return formatPace(metersPerSecond, unit);
+  } else {
+    return formatSpeed(metersPerSecond, unit);
+  }
 };
 
 export const getWeeksRemainingInYear = () => {

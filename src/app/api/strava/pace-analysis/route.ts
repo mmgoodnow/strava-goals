@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getActivities } from '@/lib/strava';
+import { SportType } from '@/lib/utils';
 
 export async function GET(request: Request) {
   const cookieStore = await cookies();
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const yearsBack = parseInt(searchParams.get('years') || '3');
+  const sport = (searchParams.get('sport') as SportType) || 'Run';
 
   try {
     const currentYear = new Date().getFullYear();
@@ -35,9 +37,9 @@ export async function GET(request: Request) {
       allActivities.push(...yearActivities);
     }
     
-    // Filter for running activities only and add pace calculation
-    const runningActivities = allActivities
-      .filter((activity: { type: string }) => activity.type === 'Run')
+    // Filter for specified sport activities and add pace/speed calculation
+    const sportActivities = allActivities
+      .filter((activity: { type: string }) => activity.type === sport)
       .map((activity: { 
         id: string; 
         name: string; 
@@ -60,8 +62,8 @@ export async function GET(request: Request) {
       );
 
     return NextResponse.json({
-      activities: runningActivities,
-      count: runningActivities.length,
+      activities: sportActivities,
+      count: sportActivities.length,
       years: yearsBack
     });
   } catch (error) {
