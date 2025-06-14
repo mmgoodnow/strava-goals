@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ComposedChart, Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { PaceActivity, calculateTrendline, formatPaceTime, SportType, SPORT_CONFIG, formatSportMetric, formatSpeed } from '@/lib/utils';
+import { PaceActivity, calculateTrendline, formatPaceTime, SportType, SPORT_CONFIG } from '@/lib/utils';
 
 interface PaceAnalysisData {
   activities: PaceActivity[];

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ProgressCard from './ProgressCard';
 import RunChart from './RunChart';
 import RecentRuns from './RecentRuns';
@@ -59,13 +59,7 @@ export default function Dashboard() {
     setYearlyGoal(savedGoal ? parseFloat(savedGoal) : defaultGoal * 1609.34);
   }, []);
 
-  useEffect(() => {
-    if (isHydrated) {
-      fetchData();
-    }
-  }, [sport, isHydrated]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [activitiesRes, statsRes] = await Promise.all([
@@ -90,7 +84,13 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sport]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      fetchData();
+    }
+  }, [sport, isHydrated, fetchData]);
 
   const handleGoalUpdate = (newGoal: number) => {
     setYearlyGoal(newGoal);

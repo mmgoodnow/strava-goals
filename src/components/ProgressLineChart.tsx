@@ -1,6 +1,6 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, Area, ComposedChart, defs, linearGradient, stop } from 'recharts';
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, Area, ComposedChart } from 'recharts';
 import { formatDistance } from '@/lib/utils';
 
 interface Activity {
@@ -31,7 +31,6 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
   // Create daily data points to show continuous target progression
   const data = [];
   let cumulativeDistance = 0;
-  let activityIndex = 0;
   
   // Create a map of activities by date for quick lookup
   const activitiesByDate = new Map();
