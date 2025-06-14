@@ -16,7 +16,14 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const sport = (searchParams.get('sport') as SportType) || 'Run';
+    const sport = searchParams.get('sport') as SportType;
+    
+    if (!sport) {
+      return NextResponse.json(
+        { error: 'Sport parameter is required' },
+        { status: 400 }
+      );
+    }
     
     const yearStart = getYearStartTimestamp();
     const yearEnd = getYearEndTimestamp();

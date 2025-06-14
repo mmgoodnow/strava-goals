@@ -15,8 +15,15 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const yearsBack = parseInt(searchParams.get('years') || '3');
-  const sport = (searchParams.get('sport') as SportType) || 'Run';
+  const yearsBack = parseInt(searchParams.get('years') || '1');
+  const sport = searchParams.get('sport') as SportType;
+  
+  if (!sport) {
+    return NextResponse.json(
+      { error: 'Sport parameter is required' },
+      { status: 400 }
+    );
+  }
 
   try {
     const currentYear = new Date().getFullYear();

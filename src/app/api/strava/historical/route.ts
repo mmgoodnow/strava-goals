@@ -14,9 +14,17 @@ export async function GET(request: Request) {
     );
   }
 
+  const { searchParams } = new URL(request.url);
+  const sport = searchParams.get('sport') as SportType;
+  
+  if (!sport) {
+    return NextResponse.json(
+      { error: 'Sport parameter is required' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const sport = (searchParams.get('sport') as SportType) || 'Run';
     
     const currentYear = new Date().getFullYear();
     const yearsToFetch = 5; // Fetch data for the last 5 years
