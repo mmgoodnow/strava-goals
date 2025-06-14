@@ -54,7 +54,7 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
     // Add any activities that happened on this day
     if (activitiesByDate.has(dateStr)) {
       const dayActivities = activitiesByDate.get(dateStr);
-      dayActivities.forEach(activity => {
+      dayActivities?.forEach((activity: Activity) => {
         cumulativeDistance += activity.distance;
       });
     }
