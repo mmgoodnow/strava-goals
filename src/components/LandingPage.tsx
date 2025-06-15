@@ -63,7 +63,7 @@ export default function LandingPage() {
         {/* What You'll See Section */}
         <div className="bg-white rounded-xl shadow-xl p-8 max-w-4xl mx-auto mb-16">
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
-            What You'll Get
+            What You&apos;ll Get
           </h2>
           <div className="space-y-6">
             <div className="flex items-start space-x-4">
@@ -74,7 +74,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">Year Progress Tracking</h3>
-                <p className="text-gray-600">See exactly how you're progressing toward your yearly distance goal with daily updates and trend analysis.</p>
+                <p className="text-gray-600">See exactly how you&apos;re progressing toward your yearly distance goal with daily updates and trend analysis.</p>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">Visual Insights</h3>
-                <p className="text-gray-600">Interactive charts showing when you're ahead or behind pace, monthly breakdowns, and recent activity summaries.</p>
+                <p className="text-gray-600">Interactive charts showing when you&apos;re ahead or behind pace, monthly breakdowns, and recent activity summaries.</p>
               </div>
             </div>
 
@@ -120,7 +120,7 @@ export default function LandingPage() {
         <div className="text-center max-w-2xl mx-auto">
           <p className="text-gray-500 text-sm mb-6">
             Your Strava data is used only to display your activity statistics and progress. 
-            We don't store your personal information or share data with third parties.
+            We don&apos;t store your personal information or share data with third parties.
           </p>
           <button
             onClick={handleConnectStrava}
