@@ -59,7 +59,7 @@ export const SPORT_CONFIG: Record<SportType, SportConfig> = {
     name: 'Running',
     icon: '🏃',
     unit: 'pace',
-    goalRanges: [200, 300, 500, 750, 1000, 1200, 1500, 2000]
+    goalRanges: [200, 250, 300, 365, 400, 500, 750, 1000]
   },
   Ride: {
     name: 'Cycling', 
