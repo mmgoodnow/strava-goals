@@ -10,36 +10,53 @@ interface RunChartProps {
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+type RunTooltipPayload = {
+  payload: {
+    month: string;
+    distance: number;
+    distanceMiles: number;
+  };
+};
+
+function RunChartTooltip({
+  active,
+  payload,
+  monthlyTargetMeters,
+}: { active?: boolean; payload?: RunTooltipPayload[]; monthlyTargetMeters: number }) {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+
+  const tooltipPayload = payload[0]?.payload;
+  if (!tooltipPayload) {
+    return null;
+  }
+
+  const distance = tooltipPayload.distance;
+  const difference = distance - monthlyTargetMeters;
+  const isOver = difference >= 0;
+
+  return (
+    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <p className="font-semibold text-lg">{tooltipPayload.month}</p>
+      <p className="text-orange-500 font-medium">{formatDistance(distance)}</p>
+      <p className={`text-sm mt-1 ${isOver ? 'text-green-600' : 'text-red-600'}`}>
+        {isOver ? '+' : ''}
+        {formatDistance(difference)} {isOver ? 'over' : 'under'} target
+      </p>
+    </div>
+  );
+}
+
 export default function RunChart({ monthlyDistance, yearlyGoal }: RunChartProps) {
-  const monthlyTarget = (yearlyGoal / 12) * 0.000621371; // Average monthly target in miles
+  const monthlyTargetMeters = yearlyGoal / 12;
+  const monthlyTargetMiles = monthlyTargetMeters * 0.000621371;
   
   const data = monthNames.map((month, index) => ({
     month,
     distance: monthlyDistance[index] || 0,
     distanceMiles: (monthlyDistance[index] || 0) * 0.000621371,
   }));
-
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { month: string; distance: number; distanceMiles: number } }> }) => {
-    if (active && payload && payload.length) {
-      const distance = payload[0].payload.distance;
-      const monthlyTargetMeters = yearlyGoal / 12;
-      const difference = distance - monthlyTargetMeters;
-      const isOver = difference >= 0;
-      
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-lg">{payload[0].payload.month}</p>
-          <p className="text-orange-500 font-medium">
-            {formatDistance(distance)}
-          </p>
-          <p className={`text-sm mt-1 ${isOver ? 'text-green-600' : 'text-red-600'}`}>
-            {isOver ? '+' : ''}{formatDistance(difference)} {isOver ? 'over' : 'under'} target
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -59,14 +76,14 @@ export default function RunChart({ monthlyDistance, yearlyGoal }: RunChartProps)
               axisLine={{ stroke: '#e5e7eb' }}
               label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<RunChartTooltip monthlyTargetMeters={monthlyTargetMeters} />} />
             <Bar 
               dataKey="distanceMiles" 
               fill="#fb923c"
               radius={[8, 8, 0, 0]}
             />
             <ReferenceLine 
-              y={monthlyTarget} 
+              y={monthlyTargetMiles} 
               stroke="#ef4444" 
               strokeDasharray="5 5"
               strokeWidth={2}
@@ -76,7 +93,7 @@ export default function RunChart({ monthlyDistance, yearlyGoal }: RunChartProps)
         </ResponsiveContainer>
       </div>
       <div className="mt-2 text-sm text-gray-600 text-center">
-        Monthly target: {monthlyTarget.toFixed(1)} miles
+        Monthly target: {monthlyTargetMiles.toFixed(1)} miles
       </div>
     </div>
   );

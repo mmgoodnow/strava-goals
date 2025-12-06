@@ -17,6 +17,43 @@ interface ProgressLineChartProps {
   yearlyGoal: number;
 }
 
+type ProgressTooltipPayload = {
+  payload: {
+    date: Date;
+    actual: number | null;
+    targetMiles: number | null;
+  };
+};
+
+function ProgressTooltip({ active, payload }: { active?: boolean; payload?: ProgressTooltipPayload[] }) {
+  if (!active || !payload || !payload.length) {
+    return null;
+  }
+
+  const tooltipPayload = payload[0]?.payload;
+  if (!tooltipPayload || tooltipPayload.actual === null || tooltipPayload.targetMiles === null) {
+    return null;
+  }
+
+  const date = new Date(tooltipPayload.date);
+  const targetMeters = tooltipPayload.targetMiles / 0.000621371;
+  const difference = Math.abs(tooltipPayload.actual - targetMeters);
+  const isAhead = tooltipPayload.actual >= targetMeters;
+
+  return (
+    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <p className="font-semibold">
+        {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </p>
+      <p className="text-blue-600">Actual: {formatDistance(tooltipPayload.actual)}</p>
+      <p className="text-gray-600">Target: {formatDistance(targetMeters)}</p>
+      <p className={isAhead ? 'text-green-600' : 'text-red-600'}>
+        {isAhead ? 'Ahead by' : 'Behind by'}: {formatDistance(difference)}
+      </p>
+    </div>
+  );
+}
+
 export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLineChartProps) {
   // Calculate cumulative distance by date
   const sortedActivities = [...activities]
@@ -89,27 +126,6 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
     negativeArea: null,
   });
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { date: Date; actual: number; targetMiles: number } }> }) => {
-    if (active && payload && payload.length && payload[0].payload.actual !== null) {
-      const date = new Date(payload[0].payload.date);
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-          <p className="text-blue-600">
-            Actual: {formatDistance(payload[0].payload.actual)}
-          </p>
-          <p className="text-gray-600">
-            Target: {formatDistance(payload[0].payload.targetMiles / 0.000621371)}
-          </p>
-          <p className={payload[0].payload.actual >= payload[0].payload.targetMiles / 0.000621371 ? 'text-green-600' : 'text-red-600'}>
-            {payload[0].payload.actual >= payload[0].payload.targetMiles / 0.000621371 ? 'Ahead by' : 'Behind by'}: {formatDistance(Math.abs(payload[0].payload.actual - payload[0].payload.targetMiles / 0.000621371))}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-  
   // Create tick values for x-axis (monthly)
   const xAxisTicks = Array.from({length: 12}, (_, i) => {
     const monthDate = new Date(year, i, 1);
@@ -142,7 +158,7 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
               axisLine={{ stroke: '#e5e7eb' }}
               label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ProgressTooltip />} />
             <Legend />
             <Line 
               type="monotone" 

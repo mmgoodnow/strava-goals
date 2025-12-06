@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as strava from 'strava-v3';
 
 const stravaClient = new (strava as any).client(process.env.STRAVA_CLIENT_SECRET || '');
