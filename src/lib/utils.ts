@@ -161,6 +161,12 @@ export interface PaceActivity {
   moving_time: number;
   start_date: string;
   pace: number;
+  heart_rate?: number | null;
+  max_heart_rate?: number | null;
+  average_watts?: number | null;
+  total_elevation_gain?: number | null;
+  estimated_vo2?: number | null;
+  vo2_source?: 'power' | 'pace_grade' | null;
 }
 
 export interface AggregatedPaceData {

@@ -8,6 +8,11 @@ interface PaceAnalysisData {
   activities: PaceActivity[];
   count: number;
   years: number;
+  vo2Summary?: {
+    count: number;
+    powerCount: number;
+    paceGradeCount: number;
+  };
 }
 
 interface PaceAnalysisChartProps {
@@ -19,13 +24,20 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [yearsBack, setYearsBack] = useState<1 | 2 | 3>(1);
-  const [viewMode, setViewMode] = useState<'pace' | 'distance'>('pace');
+  const [viewMode, setViewMode] = useState<'pace' | 'distance' | 'heartRate' | 'vo2'>('pace');
   
   const sportConfig = SPORT_CONFIG[sport];
+  const isVo2ModeAvailable = sport === 'Run';
 
   useEffect(() => {
     fetchPaceData();
   }, [yearsBack, sport]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!isVo2ModeAvailable && viewMode === 'vo2') {
+      setViewMode('pace');
+    }
+  }, [isVo2ModeAvailable, viewMode]);
 
   const fetchPaceData = async () => {
     try {
@@ -53,9 +65,13 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
   const renderHeader = () => (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
-        {viewMode === 'pace' 
+        {viewMode === 'pace'
           ? (sport === 'Run' ? 'Pace Analysis' : 'Speed Analysis')
-          : 'Distance Analysis'
+          : viewMode === 'distance'
+            ? 'Distance Analysis'
+            : viewMode === 'heartRate'
+              ? 'Heart Rate Analysis'
+              : 'Estimated VO2max (Proxy)'
         }
       </h2>
       
@@ -82,6 +98,28 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
           >
             Distance
           </button>
+          <button
+            onClick={() => setViewMode('heartRate')}
+            className={`px-3 py-2 rounded-lg font-medium transition ${
+              viewMode === 'heartRate'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Heart Rate
+          </button>
+          {isVo2ModeAvailable && (
+            <button
+              onClick={() => setViewMode('vo2')}
+              className={`px-3 py-2 rounded-lg font-medium transition ${
+                viewMode === 'vo2'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              VO2 Est.
+            </button>
+          )}
         </div>
         
         {/* Years selector */}
@@ -139,7 +177,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
   }
 
   // Prepare individual activity data for scatter plot
-  const chartData = data.activities.map((activity) => {
+  const rawChartData = data.activities.map((activity) => {
     const date = new Date(activity.start_date);
     const distanceMiles = activity.distance * 0.000621371;
     
@@ -149,21 +187,58 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
       // Convert pace (min/mile) to speed (mph)
       speedValue = 60 / activity.pace;
     }
+
+    const heartRate = activity.heart_rate ?? null;
+    const estimatedVo2 = activity.estimated_vo2 ?? null;
+    const vo2Source = activity.vo2_source ?? null;
+    const yValue = viewMode === 'pace'
+      ? (sport === 'Run' ? activity.pace : speedValue)
+      : viewMode === 'distance'
+        ? distanceMiles
+        : viewMode === 'heartRate'
+          ? heartRate
+          : estimatedVo2;
     
     return {
       x: date.getTime(), // Use timestamp for proper date spacing
-      y: viewMode === 'pace' ? (sport === 'Run' ? activity.pace : speedValue) : distanceMiles,
+      y: typeof yValue === 'number' && yValue > 0 ? yValue : null,
       date: date.toLocaleDateString(),
       name: activity.name,
       distance: activity.distance,
       distanceMiles: distanceMiles,
       pace: activity.pace,
       speed: speedValue,
+      heartRate,
+      estimatedVo2,
+      vo2Source,
       moving_time: activity.moving_time,
       year: date.getFullYear(),
       fullDate: date
     };
   });
+
+  const chartData = rawChartData.filter((point) => point.y !== null) as Array<(typeof rawChartData)[number] & { y: number }>;
+  const vo2PowerCountFromChart = chartData.filter((point) => point.vo2Source === 'power').length;
+  const vo2PaceGradeCountFromChart = chartData.filter((point) => point.vo2Source === 'pace_grade').length;
+
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        {renderHeader()}
+        <div className="text-center py-8">
+          <p className="text-gray-600">
+            {viewMode === 'heartRate'
+              ? `No heart rate data available for ${sportConfig.name.toLowerCase()} activities in this period`
+              : viewMode === 'vo2'
+                ? `No estimated VO2 data available for ${sportConfig.name.toLowerCase()} activities in this period`
+                : `No ${sportConfig.name.toLowerCase()} data available for this view`
+            }
+          </p>
+          <p className="text-sm text-gray-500 mt-2">Try selecting a different time period above</p>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate trendline for individual runs
   const trendlineData = chartData.map((point) => ({ averagePace: point.y, date: point.fullDate }));
@@ -178,9 +253,10 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
   // Add trendline values to chart data
   // For trendline calculation, we need to map timestamps to indices for the linear regression
   const sortedData = [...chartData].sort((a, b) => a.x - b.x);
+  const hasTrendline = sortedData.length > 1;
   const chartDataWithTrend = sortedData.map((point, index) => ({
     ...point,
-    trendY: trendline.slope * index + trendline.intercept
+    trendY: hasTrendline ? (trendline.slope * index + trendline.intercept) : point.y
   }));
 
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { 
@@ -189,6 +265,9 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
     y: number;
     pace: number;
     speed: number;
+    heartRate: number | null;
+    estimatedVo2: number | null;
+    vo2Source: 'power' | 'pace_grade' | null;
     distanceMiles: number;
     distance: number; 
     moving_time: number; 
@@ -209,17 +288,34 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
                 : `${activityData.speed.toFixed(1)} mph`
               }
             </p>
-          ) : (
+          ) : viewMode === 'distance' ? (
             <p className="text-blue-600 text-lg font-bold">
               {activityData.distanceMiles.toFixed(2)} miles
+            </p>
+          ) : (
+            <p className="text-blue-600 text-lg font-bold">
+              {viewMode === 'heartRate'
+                ? (activityData.heartRate ? `${activityData.heartRate.toFixed(0)} bpm` : 'N/A')
+                : (activityData.estimatedVo2 ? `${activityData.estimatedVo2.toFixed(1)} ml/kg/min` : 'N/A')
+              }
             </p>
           )}
           <p className="text-gray-600 text-sm">
             {viewMode === 'pace' 
               ? `${activityData.distanceMiles.toFixed(2)} miles • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
-              : sport === 'Run'
-                ? `${formatPaceTime(activityData.pace)}/mi • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
-                : `${activityData.speed.toFixed(1)} mph • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+              : viewMode === 'distance'
+                ? sport === 'Run'
+                  ? `${formatPaceTime(activityData.pace)}/mi • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+                  : `${activityData.speed.toFixed(1)} mph • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+                : viewMode === 'heartRate'
+                  ? `${activityData.distanceMiles.toFixed(2)} miles • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
+                  : `${activityData.distanceMiles.toFixed(2)} miles • ${
+                      activityData.vo2Source === 'power'
+                        ? 'Power-based'
+                        : activityData.vo2Source === 'pace_grade'
+                          ? 'Pace+Grade-based'
+                          : 'Proxy-based'
+                    }`
             }
           </p>
           <p className="text-gray-500 text-sm">
@@ -233,13 +329,27 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
 
   // Calculate trend direction
-  const trendDirection = viewMode === 'pace' 
-    ? (sport === 'Run' 
-        ? (trendline.slope < 0 ? 'improving' : 'declining')  // For running, lower pace is better
-        : (trendline.slope > 0 ? 'improving' : 'declining')  // For cycling, higher speed is better
-      )
-    : (trendline.slope > 0 ? 'increasing' : 'decreasing');
   const trendMagnitude = Math.abs(trendline.slope);
+  const hasMeaningfulTrend = trendMagnitude > (viewMode === 'vo2' ? 0.05 : 0.01);
+  const trendDirection = !hasMeaningfulTrend
+    ? 'stable'
+    : viewMode === 'pace'
+      ? (sport === 'Run'
+          ? (trendline.slope < 0 ? 'improving' : 'declining')  // For running, lower pace is better
+          : (trendline.slope > 0 ? 'improving' : 'declining')  // For cycling, higher speed is better
+        )
+      : viewMode === 'vo2'
+        ? (trendline.slope > 0 ? 'improving' : 'declining')
+        : (trendline.slope > 0 ? 'increasing' : 'decreasing');
+  const trendColorClass = !hasMeaningfulTrend
+    ? 'text-gray-600'
+    : (viewMode === 'pace' && trendDirection === 'improving') ||
+      (viewMode === 'distance' && trendDirection === 'increasing') ||
+      (viewMode === 'vo2' && trendDirection === 'improving')
+      ? 'text-green-600'
+      : viewMode === 'heartRate'
+        ? 'text-blue-600'
+        : 'text-red-600';
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -247,18 +357,29 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
       <div className="mb-4 flex flex-wrap gap-4 text-sm text-gray-600">
         <span>Total {sport === 'Run' ? 'runs' : 'rides'}: {data.count}</span>
-        <span className={`font-medium ${
-          (viewMode === 'pace' && trendDirection === 'improving') || 
-          (viewMode === 'distance' && trendDirection === 'increasing') 
-            ? 'text-green-600' : 'text-red-600'
-        }`}>
-          Trend: {trendDirection} {trendMagnitude > 0.01 ? 
+        {viewMode === 'heartRate' && (
+          <span>With heart rate data: {chartData.length}</span>
+        )}
+        {viewMode === 'vo2' && (
+          <>
+            <span>With VO2 estimates: {data.vo2Summary?.count ?? chartData.length}</span>
+            <span>
+              Sources: {data.vo2Summary?.powerCount ?? vo2PowerCountFromChart} power, {data.vo2Summary?.paceGradeCount ?? vo2PaceGradeCountFromChart} pace+grade
+            </span>
+          </>
+        )}
+        <span className={`font-medium ${trendColorClass}`}>
+          Trend: {trendDirection} {hasMeaningfulTrend ? 
             viewMode === 'pace' 
               ? (sport === 'Run' 
                   ? `(${formatPaceTime(trendMagnitude)}/mi per run)`
                   : `(${trendMagnitude.toFixed(1)} mph per ride)`
                 )
-              : `(${trendMagnitude.toFixed(2)} mi per ${sport === 'Run' ? 'run' : 'ride'})`
+              : viewMode === 'distance'
+                ? `(${trendMagnitude.toFixed(2)} mi per ${sport === 'Run' ? 'run' : 'ride'})`
+                : viewMode === 'heartRate'
+                  ? `(${trendMagnitude.toFixed(1)} bpm per ${sport === 'Run' ? 'run' : 'ride'})`
+                  : `(${trendMagnitude.toFixed(2)} ml/kg/min per run)`
             : '(minimal change)'
           }
         </span>
@@ -281,13 +402,23 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
               }}
             />
             <YAxis 
-              domain={['dataMin - 0.5', 'dataMax + 0.5']}
+              domain={
+                viewMode === 'heartRate'
+                  ? ['dataMin - 5', 'dataMax + 5']
+                  : viewMode === 'vo2'
+                    ? ['dataMin - 2', 'dataMax + 2']
+                    : ['dataMin - 0.5', 'dataMax + 0.5']
+              }
               tick={{ fill: '#6b7280' }}
               axisLine={{ stroke: '#e5e7eb' }}
               label={{ 
                 value: viewMode === 'pace' 
                   ? (sport === 'Run' ? 'Pace (min/mile)' : 'Speed (mph)') 
-                  : 'Distance (miles)', 
+                  : viewMode === 'distance'
+                    ? 'Distance (miles)'
+                    : viewMode === 'heartRate'
+                      ? 'Heart Rate (bpm)'
+                      : 'Estimated VO2max (ml/kg/min)',
                 angle: -90, 
                 position: 'insideLeft', 
                 fill: '#6b7280' 
@@ -295,7 +426,11 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
               tickFormatter={(value) => 
                 viewMode === 'pace' 
                   ? (sport === 'Run' ? formatPaceTime(value) : `${value.toFixed(1)}`)
-                  : `${value.toFixed(1)}`
+                  : viewMode === 'distance'
+                    ? `${value.toFixed(1)}`
+                    : viewMode === 'heartRate'
+                      ? `${Math.round(value)}`
+                      : `${value.toFixed(1)}`
               }
             />
             <Tooltip content={<CustomTooltip />} />
@@ -307,7 +442,11 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
               fill="#3b82f6"
               name={viewMode === 'pace' 
                 ? (sport === 'Run' ? 'Run Pace' : 'Ride Speed') 
-                : `${sportConfig.name} Distance`
+                : viewMode === 'distance'
+                  ? `${sportConfig.name} Distance`
+                  : viewMode === 'heartRate'
+                    ? `${sportConfig.name} Heart Rate`
+                    : 'Estimated VO2max (Proxy)'
               }
             />
             
