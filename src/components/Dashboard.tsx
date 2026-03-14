@@ -8,6 +8,7 @@ import GoalSetter from './GoalSetter';
 import ProgressLineChart from './ProgressLineChart';
 import WeeklyTargets from './WeeklyTargets';
 import PaceAnalysisChart from './PaceAnalysisChart';
+import WeekdayAverageChart from './WeekdayAverageChart';
 import { SportType, SPORT_CONFIG } from '@/lib/utils';
 
 interface Activity {
@@ -196,8 +197,9 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <RunChart monthlyDistance={data.monthlyDistance} yearlyGoal={yearlyGoal} />
+        <WeekdayAverageChart activities={data.activities} />
         <RecentRuns activities={data.activities} />
       </div>
 
