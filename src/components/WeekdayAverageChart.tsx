@@ -21,6 +21,7 @@ type WeekdayTooltipPayload = {
     averageDistance: number;
     averageMiles: number;
     runCount: number;
+    weekdayCount: number;
   };
 };
 
@@ -41,13 +42,16 @@ function WeekdayChartTooltip({
     <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
       <p className="font-semibold text-lg">{tooltipPayload.weekday}</p>
       <p className="text-orange-500 font-medium">{formatDistance(tooltipPayload.averageDistance)} avg</p>
-      <p className="text-sm mt-1 text-gray-600">Based on {tooltipPayload.runCount} activities</p>
+      <p className="text-sm mt-1 text-gray-600">
+        Based on {tooltipPayload.weekdayCount} calendar days ({tooltipPayload.runCount} activities)
+      </p>
     </div>
   );
 }
 
 export default function WeekdayAverageChart({ activities }: WeekdayAverageChartProps) {
   const weekdayTotals = Array.from({ length: 7 }, () => ({ totalDistance: 0, runCount: 0 }));
+  const weekdayCounts = Array.from({ length: 7 }, () => 0);
 
   activities.forEach((activity) => {
     const weekday = new Date(activity.start_date).getDay();
@@ -55,15 +59,32 @@ export default function WeekdayAverageChart({ activities }: WeekdayAverageChartP
     weekdayTotals[weekday].runCount += 1;
   });
 
+  if (activities.length > 0) {
+    const activityDates = activities.map((activity) => new Date(activity.start_date));
+    const firstDate = new Date(Math.min(...activityDates.map((date) => date.getTime())));
+    const lastDate = new Date(Math.max(...activityDates.map((date) => date.getTime())));
+
+    firstDate.setHours(0, 0, 0, 0);
+    lastDate.setHours(0, 0, 0, 0);
+
+    const cursor = new Date(firstDate);
+    while (cursor <= lastDate) {
+      weekdayCounts[cursor.getDay()] += 1;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+  }
+
   const data = weekdayNames.map((weekday, index) => {
     const totals = weekdayTotals[index];
-    const averageDistance = totals.runCount ? totals.totalDistance / totals.runCount : 0;
+    const weekdayCount = weekdayCounts[index];
+    const averageDistance = weekdayCount ? totals.totalDistance / weekdayCount : 0;
 
     return {
       weekday,
       averageDistance,
       averageMiles: averageDistance * 0.000621371,
       runCount: totals.runCount,
+      weekdayCount,
     };
   });
 
@@ -95,7 +116,7 @@ export default function WeekdayAverageChart({ activities }: WeekdayAverageChartP
         </ResponsiveContainer>
       </div>
       <div className="mt-2 text-sm text-gray-600 text-center">
-        Average distance per activity for each weekday
+        Average distance per calendar weekday across the selected date range
       </div>
     </div>
   );
