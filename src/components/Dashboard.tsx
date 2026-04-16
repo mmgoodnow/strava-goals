@@ -23,7 +23,7 @@ interface Activity {
 interface DashboardData {
   activities: Activity[];
   totalDistance: number;
-  monthlyDistance: Record<number, number>;
+  weeklyDistance: Record<number, number>;
   count: number;
   stats?: {
     recent_run_totals?: {
@@ -198,7 +198,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <RunChart monthlyDistance={data.monthlyDistance} yearlyGoal={yearlyGoal} />
+        <RunChart weeklyDistance={data.weeklyDistance} yearlyGoal={yearlyGoal} />
         <WeekdayAverageChart activities={data.activities} />
         <RecentRuns activities={data.activities} />
       </div>
