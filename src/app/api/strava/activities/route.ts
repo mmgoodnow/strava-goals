@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { getActivities } from '@/lib/strava';
 import { getYearStartTimestamp, getYearEndTimestamp, SportType } from '@/lib/utils';
 
+const millisecondsPerDay = 1000 * 60 * 60 * 24;
+
 export async function GET(request: Request) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('strava_access_token');
@@ -27,6 +29,7 @@ export async function GET(request: Request) {
     
     const yearStart = getYearStartTimestamp();
     const yearEnd = getYearEndTimestamp();
+    const yearStartDate = new Date(new Date().getFullYear(), 0, 1);
     
     const activities = await getActivities(
       accessToken.value,
@@ -43,16 +46,22 @@ export async function GET(request: Request) {
       0
     );
     
-    const monthlyDistance = sportActivities.reduce((acc: Record<number, number>, activity: { start_date: string; distance: number }) => {
-      const month = new Date(activity.start_date).getMonth();
-      acc[month] = (acc[month] || 0) + activity.distance;
+    const weeklyDistance = sportActivities.reduce((acc: Record<number, number>, activity: { start_date: string; distance: number }) => {
+      const activityDate = new Date(activity.start_date);
+      const daysSinceYearStart = Math.floor((activityDate.getTime() - yearStartDate.getTime()) / millisecondsPerDay);
+      const week = Math.floor(daysSinceYearStart / 7);
+
+      if (week >= 0) {
+        acc[week] = (acc[week] || 0) + activity.distance;
+      }
+
       return acc;
     }, {});
 
     return NextResponse.json({
       activities: sportActivities,
       totalDistance,
-      monthlyDistance,
+      weeklyDistance,
       count: sportActivities.length,
     });
   } catch (error) {
