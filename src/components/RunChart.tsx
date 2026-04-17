@@ -62,11 +62,11 @@ function RunChartTooltip({
   const isOver = difference >= 0;
 
   return (
-    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+    <div className="bg-surface text-foreground p-3 border border-border rounded-lg shadow-lg">
       <p className="font-semibold text-lg">{tooltipPayload.label}</p>
-      <p className="text-sm text-gray-600">{tooltipPayload.range}</p>
+      <p className="text-sm text-foreground-muted">{tooltipPayload.range}</p>
       <p className="text-orange-500 font-medium">{formatDistance(distance)}</p>
-      <p className={`text-sm mt-1 ${isOver ? 'text-green-600' : 'text-red-600'}`}>
+      <p className={`text-sm mt-1 ${isOver ? 'text-accent-green' : 'text-accent-red'}`}>
         {isOver ? '+' : ''}
         {formatDistance(difference)} {isOver ? 'over' : 'under'} target
       </p>
@@ -92,23 +92,23 @@ export default function RunChart({ weeklyDistance, yearlyGoal }: RunChartProps) 
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Weekly Progress</h2>
-      
+    <div className="bg-surface rounded-lg shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-foreground-strong mb-4">Weekly Progress</h2>
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
+            <XAxis
               dataKey="label"
               interval={3}
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
             />
-            <YAxis 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
+            <YAxis
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: 'var(--color-chart-tick)' }}
             />
             <Tooltip content={<RunChartTooltip weeklyTargetMeters={weeklyTargetMeters} />} />
             <Bar 
@@ -126,7 +126,7 @@ export default function RunChart({ weeklyDistance, yearlyGoal }: RunChartProps) 
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="mt-2 text-sm text-gray-600 text-center">
+      <div className="mt-2 text-sm text-foreground-muted text-center">
         Weekly target: {weeklyTargetMiles.toFixed(1)} miles
       </div>
     </div>

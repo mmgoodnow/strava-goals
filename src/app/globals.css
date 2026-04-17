@@ -1,27 +1,97 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  color-scheme: light dark;
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f4f6;
+  --color-surface-hover: #e5e7eb;
+  --color-foreground: #171717;
+  --color-foreground-strong: #1f2937;
+  --color-foreground-muted: #4b5563;
+  --color-foreground-subtle: #6b7280;
+  --color-border: #e5e7eb;
+  --color-border-subtle: #f3f4f6;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-chart-grid: #f0f0f0;
+  --color-chart-axis: #e5e7eb;
+  --color-chart-tick: #6b7280;
+
+  --color-tint-green: #dcfce7;
+  --color-tint-green-soft: #f0fdf4;
+  --color-tint-blue: #eff6ff;
+  --color-tint-orange: #fff7ed;
+  --color-tint-purple: #faf5ff;
+
+  --color-accent-green: #15803d;
+  --color-accent-red: #dc2626;
+  --color-accent-blue: #2563eb;
+  --color-accent-orange: #ea580c;
+  --color-accent-purple: #9333ea;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background: #0a0a0a;
+    --color-surface: #141414;
+    --color-surface-muted: #1f1f1f;
+    --color-surface-hover: #2a2a2a;
+    --color-foreground: #ededed;
+    --color-foreground-strong: #f3f4f6;
+    --color-foreground-muted: #9ca3af;
+    --color-foreground-subtle: #6b7280;
+    --color-border: #262626;
+    --color-border-subtle: #1f1f1f;
+
+    --color-chart-grid: #262626;
+    --color-chart-axis: #333333;
+    --color-chart-tick: #9ca3af;
+
+    --color-tint-green: #14532d;
+    --color-tint-green-soft: #0b2e18;
+    --color-tint-blue: #172554;
+    --color-tint-orange: #3a1d07;
+    --color-tint-purple: #2e1065;
+
+    --color-accent-green: #4ade80;
+    --color-accent-red: #f87171;
+    --color-accent-blue: #60a5fa;
+    --color-accent-orange: #fb923c;
+    --color-accent-purple: #c084fc;
   }
 }
 
+@theme inline {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-foreground: var(--color-foreground);
+  --color-foreground-strong: var(--color-foreground-strong);
+  --color-foreground-muted: var(--color-foreground-muted);
+  --color-foreground-subtle: var(--color-foreground-subtle);
+  --color-border: var(--color-border);
+  --color-border-subtle: var(--color-border-subtle);
+
+  --color-tint-green: var(--color-tint-green);
+  --color-tint-green-soft: var(--color-tint-green-soft);
+  --color-tint-blue: var(--color-tint-blue);
+  --color-tint-orange: var(--color-tint-orange);
+  --color-tint-purple: var(--color-tint-purple);
+
+  --color-accent-green: var(--color-accent-green);
+  --color-accent-red: var(--color-accent-red);
+  --color-accent-blue: var(--color-accent-blue);
+  --color-accent-orange: var(--color-accent-orange);
+  --color-accent-purple: var(--color-accent-purple);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 body {
-  background: #f5f5f5;
-  color: var(--foreground);
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
 }

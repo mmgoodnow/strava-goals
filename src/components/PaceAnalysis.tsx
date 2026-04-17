@@ -61,10 +61,10 @@ export default function PaceAnalysis() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-surface rounded-lg shadow-lg p-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-6 bg-surface-muted rounded w-1/3 mb-4"></div>
+          <div className="h-64 bg-surface-muted rounded"></div>
         </div>
       </div>
     );
@@ -72,9 +72,9 @@ export default function PaceAnalysis() {
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Multi-Year Pace Analysis</h2>
-        <p className="text-red-600">{error || 'No data available'}</p>
+      <div className="bg-surface rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-foreground-strong mb-4">Multi-Year Pace Analysis</h2>
+        <p className="text-accent-red">{error || 'No data available'}</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export default function PaceAnalysis() {
   }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <div className="bg-surface text-foreground p-3 border border-border rounded-lg shadow-lg">
           <p className="font-semibold">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }}>
@@ -126,46 +126,46 @@ export default function PaceAnalysis() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-surface rounded-lg shadow-lg p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Multi-Year Pace Analysis</h2>
-        <p className="text-gray-600">Track your pace improvements over time</p>
+        <h2 className="text-2xl font-bold text-foreground-strong mb-2">Multi-Year Pace Analysis</h2>
+        <p className="text-foreground-muted">Track your pace improvements over time</p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h3 className="text-sm font-semibold text-blue-800 mb-1">Overall Trend</h3>
-          <p className={`text-lg font-bold ${trend?.isImproving ? 'text-green-600' : 'text-red-600'}`}>
+        <div className="bg-tint-blue p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-accent-blue mb-1">Overall Trend</h3>
+          <p className={`text-lg font-bold ${trend?.isImproving ? 'text-accent-green' : 'text-accent-red'}`}>
             {trend?.isImproving ? 'Improving' : 'Declining'}
           </p>
           {overallImprovement !== 0 && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-foreground-muted">
               {overallImprovement > 0 ? '+' : ''}{overallImprovement.toFixed(1)}%
             </p>
           )}
         </div>
-        
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h3 className="text-sm font-semibold text-green-800 mb-1">Best Year</h3>
-          <p className="text-lg font-bold text-green-600">
+
+        <div className="bg-tint-green-soft p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-accent-green mb-1">Best Year</h3>
+          <p className="text-lg font-bold text-accent-green">
             {best ? best.year : 'N/A'}
           </p>
           {best && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-foreground-muted">
               {formatPaceMinutes(convertPaceToMinutesPerMile(best.averagePace))}
             </p>
           )}
         </div>
 
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <h3 className="text-sm font-semibold text-orange-800 mb-1">Total Years</h3>
-          <p className="text-lg font-bold text-orange-600">{data.yearlyData.length}</p>
+        <div className="bg-tint-orange p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-accent-orange mb-1">Total Years</h3>
+          <p className="text-lg font-bold text-accent-orange">{data.yearlyData.length}</p>
         </div>
 
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <h3 className="text-sm font-semibold text-purple-800 mb-1">Total Runs</h3>
-          <p className="text-lg font-bold text-purple-600">
+        <div className="bg-tint-purple p-4 rounded-lg">
+          <h3 className="text-sm font-semibold text-accent-purple mb-1">Total Runs</h3>
+          <p className="text-lg font-bold text-accent-purple">
             {data.yearlyData.reduce((sum, year) => sum + year.totalRuns, 0)}
           </p>
         </div>
@@ -173,13 +173,13 @@ export default function PaceAnalysis() {
 
       {/* Distance Range Filter */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           View pace by distance range:
         </label>
         <select
           value={selectedRange}
           onChange={(e) => setSelectedRange(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="bg-surface text-foreground border border-border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
         >
           <option value="overall">Overall Average</option>
           <option value="short">Short Runs (&lt; 5K)</option>
@@ -193,16 +193,16 @@ export default function PaceAnalysis() {
       <div className="h-80 mb-8">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
             <XAxis 
               dataKey="year" 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
             />
             <YAxis 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Pace (min/mile)', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{ value: 'Pace (min/mile)', angle: -90, position: 'insideLeft', fill: 'var(--color-chart-tick)' }}
               domain={['dataMin - 0.5', 'dataMax + 0.5']}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -232,19 +232,19 @@ export default function PaceAnalysis() {
 
       {/* Volume Chart */}
       <div className="h-64">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Annual Running Volume</h3>
+        <h3 className="text-lg font-semibold text-foreground-strong mb-4">Annual Running Volume</h3>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
             <XAxis 
               dataKey="year" 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
             />
             <YAxis 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: 'var(--color-chart-tick)' }}
             />
             <Tooltip 
               formatter={(value: number, name: string) => [

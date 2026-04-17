@@ -118,22 +118,22 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-4xl font-bold text-foreground-strong mb-2">
               {data?.athlete?.firstname ? `${data.athlete.firstname}'s ` : ''}{sportConfig.name} Goals
             </h1>
-            <p className="text-gray-600">Track your yearly {sportConfig.name.toLowerCase()} progress</p>
+            <p className="text-foreground-muted">Track your yearly {sportConfig.name.toLowerCase()} progress</p>
           </div>
-          
+
           {/* Sport Selector - Always visible */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-surface-muted rounded-lg p-1">
             {(Object.keys(SPORT_CONFIG) as SportType[]).map((sportType) => (
               <button
                 key={sportType}
                 onClick={() => handleSportChange(sportType)}
                 className={`px-4 py-2 rounded-md font-medium transition ${
                   sport === sportType
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-surface text-foreground-strong shadow-sm'
+                    : 'text-foreground-muted hover:text-foreground-strong'
                 }`}
               >
                 {SPORT_CONFIG[sportType].icon} {SPORT_CONFIG[sportType].name}
@@ -148,13 +148,13 @@ export default function Dashboard() {
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading your {sportConfig.name.toLowerCase()} data...</p>
+            <p className="mt-4 text-foreground-muted">Loading your {sportConfig.name.toLowerCase()} data...</p>
           </div>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <p className="text-red-600">Error: {error}</p>
+            <p className="text-red-500">Error: {error}</p>
             <button 
               onClick={() => window.location.href = '/api/auth/strava'}
               className="mt-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
@@ -166,7 +166,7 @@ export default function Dashboard() {
       ) : !data ? (
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <p className="text-gray-600">No data available</p>
+            <p className="text-foreground-muted">No data available</p>
           </div>
         </div>
       ) : (

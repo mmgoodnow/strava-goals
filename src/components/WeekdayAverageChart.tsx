@@ -39,10 +39,10 @@ function WeekdayChartTooltip({
   }
 
   return (
-    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+    <div className="bg-surface text-foreground p-3 border border-border rounded-lg shadow-lg">
       <p className="font-semibold text-lg">{tooltipPayload.weekday}</p>
       <p className="text-orange-500 font-medium">{formatDistance(tooltipPayload.averageDistance)} avg</p>
-      <p className="text-sm mt-1 text-gray-600">
+      <p className="text-sm mt-1 text-foreground-muted">
         Based on {tooltipPayload.weekdayCount} calendar days ({tooltipPayload.runCount} activities)
       </p>
     </div>
@@ -89,22 +89,22 @@ export default function WeekdayAverageChart({ activities }: WeekdayAverageChartP
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Average Miles by Weekday</h2>
+    <div className="bg-surface rounded-lg shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-foreground-strong mb-4">Average Miles by Weekday</h2>
 
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
             <XAxis
               dataKey="weekday"
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
             />
             <YAxis
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: 'var(--color-chart-tick)' }}
             />
             <Tooltip content={<WeekdayChartTooltip />} />
             <Bar
@@ -115,7 +115,7 @@ export default function WeekdayAverageChart({ activities }: WeekdayAverageChartP
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="mt-2 text-sm text-gray-600 text-center">
+      <div className="mt-2 text-sm text-foreground-muted text-center">
         Average distance per calendar weekday across the selected date range
       </div>
     </div>

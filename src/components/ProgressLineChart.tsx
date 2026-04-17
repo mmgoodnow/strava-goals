@@ -41,13 +41,13 @@ function ProgressTooltip({ active, payload }: { active?: boolean; payload?: Prog
   const isAhead = tooltipPayload.actual >= targetMeters;
 
   return (
-    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+    <div className="bg-surface text-foreground p-3 border border-border rounded-lg shadow-lg">
       <p className="font-semibold">
         {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
       </p>
-      <p className="text-blue-600">Actual: {formatDistance(tooltipPayload.actual)}</p>
-      <p className="text-gray-600">Target: {formatDistance(targetMeters)}</p>
-      <p className={isAhead ? 'text-green-600' : 'text-red-600'}>
+      <p className="text-accent-blue">Actual: {formatDistance(tooltipPayload.actual)}</p>
+      <p className="text-foreground-muted">Target: {formatDistance(targetMeters)}</p>
+      <p className={isAhead ? 'text-accent-green' : 'text-accent-red'}>
         {isAhead ? 'Ahead by' : 'Behind by'}: {formatDistance(difference)}
       </p>
     </div>
@@ -133,14 +133,14 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Year Progress vs Target</h2>
-      
+    <div className="bg-surface rounded-lg shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-foreground-strong mb-4">Year Progress vs Target</h2>
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
+            <XAxis
               dataKey="dayOfYear"
               type="number"
               domain={[0, 365]}
@@ -150,13 +150,13 @@ export default function ProgressLineChart({ activities, yearlyGoal }: ProgressLi
                 date.setDate(date.getDate() + value);
                 return date.toLocaleDateString('en-US', { month: 'short' });
               }}
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
             />
-            <YAxis 
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: '#6b7280' }}
+            <YAxis
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{ value: 'Miles', angle: -90, position: 'insideLeft', fill: 'var(--color-chart-tick)' }}
             />
             <Tooltip content={<ProgressTooltip />} />
             <Legend />

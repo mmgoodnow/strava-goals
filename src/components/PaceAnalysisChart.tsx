@@ -64,7 +64,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
   const renderHeader = () => (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
+      <h2 className="text-2xl font-bold text-foreground-strong mb-4 sm:mb-0">
         {viewMode === 'pace'
           ? (sport === 'Run' ? 'Pace Analysis' : 'Speed Analysis')
           : viewMode === 'distance'
@@ -83,7 +83,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
             className={`px-3 py-2 rounded-lg font-medium transition ${
               viewMode === 'pace'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-surface-muted text-foreground hover:bg-surface-hover'
             }`}
           >
             {sport === 'Run' ? 'Pace' : 'Speed'}
@@ -93,7 +93,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
             className={`px-3 py-2 rounded-lg font-medium transition ${
               viewMode === 'distance'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-surface-muted text-foreground hover:bg-surface-hover'
             }`}
           >
             Distance
@@ -103,7 +103,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
             className={`px-3 py-2 rounded-lg font-medium transition ${
               viewMode === 'heartRate'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-surface-muted text-foreground hover:bg-surface-hover'
             }`}
           >
             Heart Rate
@@ -114,7 +114,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
               className={`px-3 py-2 rounded-lg font-medium transition ${
                 viewMode === 'vo2'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-surface-muted text-foreground hover:bg-surface-hover'
               }`}
             >
               VO2 Est.
@@ -131,7 +131,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
               className={`px-3 py-2 rounded-lg font-medium transition ${
                 yearsBack === years
                   ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-surface-muted text-foreground hover:bg-surface-hover'
               }`}
             >
               {years} Year{years > 1 ? 's' : ''}
@@ -144,7 +144,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-surface rounded-lg shadow-lg p-6">
         {renderHeader()}
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
@@ -155,10 +155,10 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-surface rounded-lg shadow-lg p-6">
         {renderHeader()}
         <div className="text-center py-8">
-          <p className="text-red-600">{error}</p>
+          <p className="text-accent-red">{error}</p>
         </div>
       </div>
     );
@@ -166,11 +166,11 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
   if (!data || data.activities.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-surface rounded-lg shadow-lg p-6">
         {renderHeader()}
         <div className="text-center py-8">
-          <p className="text-gray-600">No {sportConfig.name.toLowerCase()} data available for analysis</p>
-          <p className="text-sm text-gray-500 mt-2">Try selecting a different time period above</p>
+          <p className="text-foreground-muted">No {sportConfig.name.toLowerCase()} data available for analysis</p>
+          <p className="text-sm text-foreground-subtle mt-2">Try selecting a different time period above</p>
         </div>
       </div>
     );
@@ -223,10 +223,10 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-surface rounded-lg shadow-lg p-6">
         {renderHeader()}
         <div className="text-center py-8">
-          <p className="text-gray-600">
+          <p className="text-foreground-muted">
             {viewMode === 'heartRate'
               ? `No heart rate data available for ${sportConfig.name.toLowerCase()} activities in this period`
               : viewMode === 'vo2'
@@ -234,7 +234,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
                 : `No ${sportConfig.name.toLowerCase()} data available for this view`
             }
           </p>
-          <p className="text-sm text-gray-500 mt-2">Try selecting a different time period above</p>
+          <p className="text-sm text-foreground-subtle mt-2">Try selecting a different time period above</p>
         </div>
       </div>
     );
@@ -279,29 +279,29 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
       const durationSeconds = activityData.moving_time % 60;
       
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <div className="bg-surface text-foreground p-3 border border-border rounded-lg shadow-lg">
           <p className="font-semibold text-sm">{activityData.name}</p>
           {viewMode === 'pace' ? (
-            <p className="text-blue-600 text-lg font-bold">
+            <p className="text-accent-blue text-lg font-bold">
               {sport === 'Run' 
                 ? `${formatPaceTime(activityData.pace)}/mi`
                 : `${activityData.speed.toFixed(1)} mph`
               }
             </p>
           ) : viewMode === 'distance' ? (
-            <p className="text-blue-600 text-lg font-bold">
+            <p className="text-accent-blue text-lg font-bold">
               {activityData.distanceMiles.toFixed(2)} miles
             </p>
           ) : (
-            <p className="text-blue-600 text-lg font-bold">
+            <p className="text-accent-blue text-lg font-bold">
               {viewMode === 'heartRate'
                 ? (activityData.heartRate ? `${activityData.heartRate.toFixed(0)} bpm` : 'N/A')
                 : (activityData.estimatedVo2 ? `${activityData.estimatedVo2.toFixed(1)} ml/kg/min` : 'N/A')
               }
             </p>
           )}
-          <p className="text-gray-600 text-sm">
-            {viewMode === 'pace' 
+          <p className="text-foreground-muted text-sm">
+            {viewMode === 'pace'
               ? `${activityData.distanceMiles.toFixed(2)} miles • ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`
               : viewMode === 'distance'
                 ? sport === 'Run'
@@ -318,7 +318,7 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
                     }`
             }
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-foreground-subtle text-sm">
             {activityData.date}
           </p>
         </div>
@@ -342,20 +342,20 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
         ? (trendline.slope > 0 ? 'improving' : 'declining')
         : (trendline.slope > 0 ? 'increasing' : 'decreasing');
   const trendColorClass = !hasMeaningfulTrend
-    ? 'text-gray-600'
+    ? 'text-foreground-muted'
     : (viewMode === 'pace' && trendDirection === 'improving') ||
       (viewMode === 'distance' && trendDirection === 'increasing') ||
       (viewMode === 'vo2' && trendDirection === 'improving')
-      ? 'text-green-600'
+      ? 'text-accent-green'
       : viewMode === 'heartRate'
-        ? 'text-blue-600'
-        : 'text-red-600';
+        ? 'text-accent-blue'
+        : 'text-accent-red';
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-surface rounded-lg shadow-lg p-6">
       {renderHeader()}
 
-      <div className="mb-4 flex flex-wrap gap-4 text-sm text-gray-600">
+      <div className="mb-4 flex flex-wrap gap-4 text-sm text-foreground-muted">
         <span>Total {sport === 'Run' ? 'runs' : 'rides'}: {data.count}</span>
         {viewMode === 'heartRate' && (
           <span>With heart rate data: {chartData.length}</span>
@@ -388,14 +388,14 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartDataWithTrend} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
+            <XAxis
               dataKey="x"
               type="number"
               scale="time"
               domain={['dataMin', 'dataMax']}
-              tick={{ fill: '#6b7280', fontSize: 10 }}
-              axisLine={{ stroke: '#e5e7eb' }}
+              tick={{ fill: 'var(--color-chart-tick)', fontSize: 10 }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
               tickFormatter={(timestamp) => {
                 const date = new Date(timestamp);
                 return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
@@ -409,19 +409,19 @@ export default function PaceAnalysisChart({ sport }: PaceAnalysisChartProps) {
                     ? ['dataMin - 2', 'dataMax + 2']
                     : ['dataMin - 0.5', 'dataMax + 0.5']
               }
-              tick={{ fill: '#6b7280' }}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ 
-                value: viewMode === 'pace' 
-                  ? (sport === 'Run' ? 'Pace (min/mile)' : 'Speed (mph)') 
+              tick={{ fill: 'var(--color-chart-tick)' }}
+              axisLine={{ stroke: 'var(--color-chart-axis)' }}
+              label={{
+                value: viewMode === 'pace'
+                  ? (sport === 'Run' ? 'Pace (min/mile)' : 'Speed (mph)')
                   : viewMode === 'distance'
                     ? 'Distance (miles)'
                     : viewMode === 'heartRate'
                       ? 'Heart Rate (bpm)'
                       : 'Estimated VO2max (ml/kg/min)',
-                angle: -90, 
-                position: 'insideLeft', 
-                fill: '#6b7280' 
+                angle: -90,
+                position: 'insideLeft',
+                fill: 'var(--color-chart-tick)'
               }}
               tickFormatter={(value) => 
                 viewMode === 'pace' 
