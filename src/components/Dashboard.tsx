@@ -178,6 +178,7 @@ export default function Dashboard() {
           totalDistance={data.totalDistance}
           yearlyGoal={yearlyGoal}
           runCount={data.count}
+          activityLabel={sport === 'Run' ? 'runs' : 'activities'}
         />
         <GoalSetter 
           currentGoal={yearlyGoal}

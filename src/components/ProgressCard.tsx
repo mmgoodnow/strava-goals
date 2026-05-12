@@ -11,15 +11,24 @@ interface ProgressCardProps {
   totalDistance: number;
   yearlyGoal: number;
   runCount: number;
+  activityLabel?: string;
 }
 
-export default function ProgressCard({ totalDistance, yearlyGoal, runCount }: ProgressCardProps) {
+export default function ProgressCard({
+  totalDistance,
+  yearlyGoal,
+  runCount,
+  activityLabel = 'runs',
+}: ProgressCardProps) {
   const progress = (totalDistance / yearlyGoal) * 100;
   const remainingDistance = Math.max(0, yearlyGoal - totalDistance);
   const daysRemaining = getDaysRemainingInYear();
   const daysElapsed = getDaysElapsedInYear();
+  const weeksElapsed = daysElapsed / 7;
   const requiredDailyDistance = calculateRequiredPace(remainingDistance, daysRemaining);
   const currentDailyAverage = totalDistance / daysElapsed;
+  const currentWeeklyActivityAverage = weeksElapsed > 0 ? runCount / weeksElapsed : 0;
+  const activityLabelTitle = activityLabel.charAt(0).toUpperCase() + activityLabel.slice(1);
 
   return (
     <div className="bg-surface rounded-lg shadow-lg p-6">
@@ -45,8 +54,13 @@ export default function ProgressCard({ totalDistance, yearlyGoal, runCount }: Pr
 
       <div className="space-y-3">
         <div className="flex justify-between">
-          <span className="text-foreground-muted">Runs completed</span>
+          <span className="text-foreground-muted">{activityLabelTitle} completed</span>
           <span className="font-semibold">{runCount}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-foreground-muted">Average {activityLabel}/week</span>
+          <span className="font-semibold">{currentWeeklyActivityAverage.toFixed(1)}</span>
         </div>
 
         <div className="flex justify-between">
